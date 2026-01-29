@@ -10,13 +10,23 @@
 * Respirce load time (Image Resource)
 * Element Render Delay (the time your resource is done loading and is then rendered to the screen)
 
-* Goals for LCP
+#### Goals for LCP
    * Spend bulk of time fetching the LCP resource
    * Minimize all other time as much as possible
 <img width="1363" height="798" alt="image" src="https://github.com/user-attachments/assets/58e1e98b-cecc-489f-928e-a730abd313df" />
 
 #### Recipe or LCP oprimization:
-*
+* Step 1: Eliminate uneccessary Resource Load Delay
+  * Ensure the LCP resource starts loading as early as possible
+    * Add priority hints or preload
+    * LCP image should have eager and not lazy load
+    * minimize network contention
+    * use same-origin resources (if possible)
+* Step 2: Eliminate unneccessary element render delay
+  * Ensure the LCP element can render immediately after its resource has finished loading (no matter when that happens)
+    * Remove or minimize render blocking stylesheets
+    * Defer render blocking JS
+    * Use font-display optional
 
 
 
