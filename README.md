@@ -2,13 +2,14 @@
 
 ## Webflow
 
-### Images
-* Always use AVIF Compression
-* Use Eager Load for top level images, lazy on scroll for the rest
-* Avoid background images, rather:
-  * Set div containing image to: position relative, overflow hidden
-  * Set image inside div to: object fit:cover, withd and height to 100%, z-index lower than the text (-1 as a default)
-* If you have to use
+### LCP - Best Practices (Identify Where the bottle neck is)
+<img width="1916" height="1067" alt="image" src="https://github.com/user-attachments/assets/8840d223-e1ae-4a94-9294-bf00b78b14aa" />
+
+* Time to Byte (HTML Document)
+* Resource load delay (Stylesheet) -> should get this as small as possible
+* Respirce load time (Image Resource)
+* Element Render Delay (the time your resource is done loading and is then rendered to the screen)
+
 
 ### Fonts
 * DO NOT use the google font feature (This fetches fonts from google server)
