@@ -43,6 +43,12 @@
     * Reduce the css file zise smaller than the LCP element
 <img width="1905" height="1064" alt="image" src="https://github.com/user-attachments/assets/6aaf4818-3dc8-4ff0-912e-476f8f0edc36" />
 
+* Step 4: Reduce Time to first byte
+  * Deliver the initial page as quickly as possible
+    * USE CDN to reduce network distance
+    * Upgrade seerver hardware
+    * Ensure response bodies can be streamed
+
 
 
 
