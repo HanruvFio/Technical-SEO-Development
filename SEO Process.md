@@ -225,7 +225,92 @@ This file isn't auto-generated — it goes stale unless someone actively maintai
 
 ---
 
-## Process Notes
+## Post-Launch Audit Process
+
+A repeatable process to run on every live site — not a one-time launch check. Same steps every cycle, so results are comparable over time.
+
+### Cadence
+- **Launch Verification:** full run-through immediately post-launch, before considering the project closed
+- **Settling-In Check:** short re-run once Google and other bots have had time to properly crawl the live site
+- **Quarterly (Ongoing):** full run-through as standard maintenance for every client site in the portfolio
+
+### The Process
+
+**1. Confirm tracking/indexing infrastructure is live**
+- **First-time setup (new site or new client):**
+  - Generate and deploy **sitemap.xml** to root (see Tools & Methods under Pillar 3 for generation options) before anything else in this list — GSC and Bing both need it. Sanity-check with `curl yourdomain.com/sitemap.xml` to confirm it resolves before submitting
+  - Generate and deploy **robots.txt** to root, with explicit AI-bot rules per the master template (see Pillar 3), and confirm it references the sitemap URL
+  - Generate and deploy **`/llms.txt`** to root using the shared template (see Pillar 3)
+  - Add the site to **Google Search Console** — use a **Domain property** (covers all subdomains/protocols via DNS verification) over a URL-prefix property where possible, since it gives broader coverage
+  - Verify ownership — DNS TXT record (preferred, covers the whole domain) or HTML file upload/meta tag if DNS access isn't available
+  - Submit the XML sitemap under Sitemaps in GSC once verified
+  - Add the site to **Bing Webmaster Tools** — can import directly from a verified GSC property, which skips a second manual verification
+  - Set up **GA4** property and data stream, confirm the tracking snippet/GTM container is live on the actual production site (not just staging)
+- **Ongoing (site already set up):**
+  - Confirm GSC and Bing Webmaster Tools are still verified and actively receiving data (a domain/DNS change can silently break verification)
+  - GA4 tracking firing correctly on key pages (check Realtime report while browsing the site)
+  - Confirm GTM containers (if used) are publishing the correct live version, not a draft
+- Nothing downstream in this process is trustworthy if this step is broken
+
+**2. Full crawl**
+- Screaming Frog crawl of the entire site
+- Export and review: 4xx/5xx errors, redirect chains (301→301→200), duplicate titles/meta descriptions, missing H1s, orphan pages
+- Cross-check crawl depth — important pages shouldn't be buried more than 3–4 clicks from the homepage
+
+**3. Performance snapshot**
+- PageSpeed Insights (lab data) on the homepage plus 2–3 key page templates — not every page individually, since templates surface systemic issues that repeat across many pages
+- Check the **CrUX/field data** tab in PageSpeed Insights (or Search Console's Core Web Vitals report) alongside lab data — field data reflects real visitor experience over the last 28 days and can reveal issues lab tests miss (e.g. slow real-world connections, specific devices)
+- Note any pages flagged "poor" or "needs improvement" in Core Web Vitals specifically, since these directly affect ranking
+
+**4. Indexation check**
+- Compare GSC's Coverage/Indexing report against the actual sitemap — flag anything submitted but not indexed, and anything indexed but not in the sitemap
+- Spot-check `site:domain.com` in Google for anything indexed that shouldn't be (staging leftovers, filtered/parameterized URLs, thank-you pages)
+- Check GSC's "Removed" and "Not found (404)" reports for anything unexpected
+
+**5. Canonical & duplicate content check**
+- Screaming Frog's canonical report, cross-referenced against known filtered/paginated URL patterns (WooCommerce filters, Webflow CMS pagination)
+- Confirm `http`/`https` and `www`/non-`www` still resolve to a single version post-launch — a hosting or DNS change can silently break this
+
+**6. Structured data validation**
+- Run Google's Rich Results Test against every schema type in use on the site
+- Confirm schema values actually match live page content (a common drift issue — schema gets set once and never updated as content changes)
+
+**7. Mobile usability & accessibility spot-check**
+- GSC's Mobile Usability report for flagged issues (tap targets too close, content wider than screen)
+- Spot-check 3–5 key pages with a free accessibility scanner (WAVE or axe DevTools) for anything beyond what Screaming Frog's crawl already caught — contrast issues, missing form labels, focus order
+- Manually tab through the primary navigation and a key form to confirm keyboard accessibility hasn't regressed
+
+**8. AI-crawlability check**
+- Confirm `robots.txt` and `/llms.txt` resolve correctly and return the expected content (`curl` both to verify)
+- Spot-check server access logs for AI bot user-agent activity (GPTBot, ClaudeBot, PerplexityBot) to confirm they're actually reaching the site, not just permitted to
+- Re-check `/llms.txt` content is still accurate against current site structure — flag if URLs have changed or content has gone stale
+
+**9. Backlink & external signal check**
+- Quick check in GSC's Links report for new/lost referring domains — a sudden drop can indicate a technical issue (broken redirect, accidental noindex) rather than an actual link loss
+- Not a full backlink audit every cycle — reserve deep link-profile analysis for cases where organic traffic has dropped unexpectedly
+
+**10. Security & uptime check**
+- Confirm SSL certificate is valid and not nearing expiry
+- Confirm no mixed-content warnings (HTTP resources loading on an HTTPS page)
+- Check hosting/uptime monitoring logs for any downtime since the last audit — even brief outages can affect crawl trust
+
+**11. Local SEO check** *(where applicable — service-area or location-based clients)*
+- Google Business Profile still matches site NAP (name, address, phone) exactly
+- LocalBusiness schema present and accurate
+
+**12. Compile findings into a single prioritized fix list**
+- Sort by actual impact across all three pillars together, not siloed by pillar — a single fix (e.g. a render-blocking third-party script) can touch performance and crawlability at once
+- Flag anything that's a regression from the previous cycle separately from net-new issues — regressions usually indicate a recent change broke something and deserve faster turnaround
+
+**13. Re-test after fixes ship, then log the new baseline**
+- Re-run the relevant checks (not the full process) to confirm each fix actually worked
+- Log the new baseline metrics — this becomes the comparison point for the next cycle, so improvement (or regression) is visible over time rather than reassessed from scratch each quarter
+
+### Notes
+- Keep a running log per client site (fix list, dates, before/after metrics) rather than treating each audit as a standalone report — the value compounds once you have a few cycles of history to compare against.
+- If step 2 or 4 turns up something unexpected (spike in 404s, sudden de-indexing), don't wait for the next scheduled cycle — investigate immediately.
+
+---
 
 - Run pillar 1 + 2 through their respective tools (PageSpeed Insights, Screaming Frog) at kickoff, pre-launch, and post-launch.
 - Pillar 3 is manual for now — assign as a pre-launch checklist item until we build internal tooling or adopt a GEO/AEO platform.
