@@ -52,6 +52,17 @@ Three-pillar SEO checklist applied to every build/rebuild. Run at project kickof
 - **Webflow:** custom code embeds in `<head>` are a common silent culprit — audit for missing `defer`/`async`. E.g. Lenis (smooth scroll) should load `defer` and initialize after DOM content is ready, not block initial render; Finsweet Consent Pro should also load `defer` rather than `async` — it needs to initialize predictably, in order, before other tracking/marketing scripts fire (it gates them), and `async`'s execution timing isn't guaranteed relative to other scripts. Both `defer` and `async` avoid blocking initial render either way, so this is a correctness choice, not a speed one. Verify against Finsweet's own implementation docs before changing — some consent scripts require a specific loading method for compliance reasons, which overrides general performance best practice
 - **WordPress/Elementor:** check "Improved CSS Loading" and "Improved Asset Loading" under Elementor's experiments; audit plugin-injected `<head>` scripts — page builder plugins are frequent offenders here
 
+**Worked Example — Diagnosing Render-Blocking Requests**
+PageSpeed Insights' "Render-blocking requests" audit will list the exact resources delaying LCP/FCP, with transfer size and duration. Example from a live audit (Est. savings: 450ms):
+
+| Resource | Size | Duration | Type | Fix |
+|---|---|---|---|---|
+| `consentpro.com` runtime JS (Finsweet Consent Pro) | 15.7 KiB | 1,180ms | Script | Add `defer` to the custom code embed — not `async`, so it still initializes in order before tracking scripts fire, just without blocking render |
+| `website-files.com` shared CSS (Webflow core stylesheet) | 28.7 KiB | 1,050ms | CSS | Platform-injected, not directly editable — can't add `defer`/`async` to a `<link>`. Focus on inlining critical CSS for page-specific styles so above-the-fold content can paint while this loads in parallel; reduces visible impact even though the file itself loads at the same speed |
+| `unpkg.com` Lenis CSS | 1.0 KiB | 750ms | CSS (CDN) | Small file, but 750ms is mostly network round-trip to the CDN, not download time. Self-host the file instead of pulling from unpkg, or inline it directly in a `<style>` tag since it's small enough — removes the external DNS lookup + connection + TLS handshake entirely |
+
+**Takeaway:** duration doesn't always track file size — a 1KB file can cost more time than a 15KB one if it's network latency rather than transfer time. Fix in priority order: easiest/self-hostable first (Lenis), then script loading attributes (Consent Pro), then platform-locked assets last (Webflow core CSS) since those have the least direct control.
+
 ### Server / Hosting
 - [ ] TTFB under 600ms
 - [ ] GZIP/Brotli compression enabled
