@@ -24,10 +24,33 @@ Three-pillar SEO checklist applied to every build/rebuild. Run at project kickof
 
 ### JS / CSS
 - [ ] Minify and bundle CSS/JS
-- [ ] Defer/async non-critical JS
 - [ ] Remove unused CSS (especially Elementor/theme bloat, unused Webflow interactions)
-- [ ] Critical CSS inlined for above-the-fold content
-- [ ] Audit third-party scripts (chat widgets, tracking pixels, popups) — lazy-load or delay until interaction
+
+**Script loading strategy**
+- Avoid plain `<script>` in `<head>` with no attributes — fully render-blocking, browser stops parsing HTML until it downloads *and* executes
+- `defer` — downloads in parallel, executes after HTML parsing completes, in order. Best for scripts needing the DOM but not immediate execution (most JS)
+- `async` — downloads in parallel, executes the instant it's ready (can interrupt parsing). Best for independent scripts with no DOM dependency (analytics, ad tags)
+- Footer placement alone isn't enough — a script in the footer without `defer`/`async` still blocks rendering of everything above it during execution. Combine footer placement + `defer` for the biggest win
+
+**CSS — the other half of render-blocking**
+- Any `<link rel="stylesheet">` in `<head>` blocks rendering by default until it downloads
+- Inline critical CSS (whatever's needed for above-the-fold content) directly in `<head>` as a `<style>` block
+- Load the rest of the stylesheet async via `<link rel="preload" as="style" onload="this.rel='stylesheet'">` or a helper like loadCSS
+- Often a bigger LCP lever than JS — the LCP element (usually hero image/heading) can't paint until its styles resolve
+
+**LCP-specific**
+- Preload the actual LCP resource: `<link rel="preload" as="image" href="hero.jpg">` so the browser fetches it immediately instead of discovering it late in the HTML
+- Never lazy-load the LCP image — it's the one image that should load eagerly
+- If the LCP element is text in a web font, preload the font too — text can't paint until the font resolves, and late-loading fonts cause flash/reflow (hurts CLS too)
+
+**Third-party scripts**
+- Chat widgets, tracking pixels, and popups are usually the worst offenders and often invisible on a quick glance — audit every third-party `<script>` tag individually
+- Most should be `async` or delayed until user interaction (scroll, click, or a few seconds post-load) rather than loaded eagerly
+- Use a facade pattern for heavy embeds (YouTube, chat widgets) — load a lightweight placeholder, swap in the real script only on interaction
+
+**Platform-specific**
+- **Webflow:** custom code embeds in `<head>` are a common silent culprit — audit for missing `defer`/`async`. E.g. Lenis (smooth scroll) should load `defer` and initialize after DOM content is ready, not block initial render; Finsweet Consent Pro should also load `defer` rather than `async` — it needs to initialize predictably, in order, before other tracking/marketing scripts fire (it gates them), and `async`'s execution timing isn't guaranteed relative to other scripts. Both `defer` and `async` avoid blocking initial render either way, so this is a correctness choice, not a speed one. Verify against Finsweet's own implementation docs before changing — some consent scripts require a specific loading method for compliance reasons, which overrides general performance best practice
+- **WordPress/Elementor:** check "Improved CSS Loading" and "Improved Asset Loading" under Elementor's experiments; audit plugin-injected `<head>` scripts — page builder plugins are frequent offenders here
 
 ### Server / Hosting
 - [ ] TTFB under 600ms
