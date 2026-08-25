@@ -149,7 +149,6 @@ PageSpeed Insights' "Render-blocking requests" audit will list the exact resourc
 ### Server / Hosting
 - [ ] TTFB under 600ms
 - [ ] GZIP/Brotli compression enabled
-- [ ] CDN in front of static assets (Cloudflare)
 - [ ] Browser caching headers set correctly
 - [ ] HTTP/2 or HTTP/3 enabled
 
