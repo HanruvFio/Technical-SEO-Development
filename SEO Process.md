@@ -15,7 +15,7 @@ A repeatable process to run on every live site — not a one-time launch check. 
 
 ### The Process
 
-**1. Confirm tracking/indexing infrastructure is live**
+#### 1. Confirm tracking/indexing infrastructure is live
 - **First-time setup (new site or new client):**
   - Generate and deploy **sitemap.xml** to root (see [Tools & Methods → Sitemaps](#sitemaps) under Pillar 3 for generation options) before anything else in this list — GSC and Bing both need it. Sanity-check with `curl yourdomain.com/sitemap.xml` to confirm it resolves before submitting
   - Generate and deploy **robots.txt** to root, with explicit AI-bot rules per the master template (see [Tools & Methods → robots.txt](#robotstxt) under Pillar 3), and confirm it references the sitemap URL
@@ -31,53 +31,53 @@ A repeatable process to run on every live site — not a one-time launch check. 
   - Confirm GTM containers (if used) are publishing the correct live version, not a draft
 - Nothing downstream in this process is trustworthy if this step is broken
 
-**2. Full crawl**
+#### 2. Full crawl
 - Screaming Frog crawl of the entire site
 - Export and review: 4xx/5xx errors, redirect chains (301→301→200), duplicate titles/meta descriptions, missing H1s, orphan pages
 - Cross-check crawl depth — important pages shouldn't be buried more than 3–4 clicks from the homepage
 
-**3. Performance snapshot**
+#### 3. Performance snapshot
 - PageSpeed Insights (lab data) on the homepage plus 2–3 key page templates — not every page individually, since templates surface systemic issues that repeat across many pages
 - Check the **CrUX/field data** tab in PageSpeed Insights (or Search Console's Core Web Vitals report) alongside lab data — field data reflects real visitor experience over the last 28 days and can reveal issues lab tests miss (e.g. slow real-world connections, specific devices)
 - Note any pages flagged "poor" or "needs improvement" in Core Web Vitals specifically, since these directly affect ranking
 
-**4. Indexation check**
+#### 4. Indexation check
 - Compare GSC's Coverage/Indexing report against the actual sitemap — flag anything submitted but not indexed, and anything indexed but not in the sitemap
 - Spot-check `site:domain.com` in Google for anything indexed that shouldn't be (staging leftovers, filtered/parameterized URLs, thank-you pages)
 - Check GSC's "Removed" and "Not found (404)" reports for anything unexpected
 
-**5. Canonical & duplicate content check**
+#### 5. Canonical & duplicate content check
 - Screaming Frog's canonical report, cross-referenced against known filtered/paginated URL patterns (WooCommerce filters, Webflow CMS pagination)
 - Confirm `http`/`https` and `www`/non-`www` still resolve to a single version post-launch — a hosting or DNS change can silently break this
 
-**6. Structured data validation**
+#### 6. Structured data validation
 - Run Google's Rich Results Test against every schema type in use on the site
 - Confirm schema values actually match live page content (a common drift issue — schema gets set once and never updated as content changes)
 
-**7. Mobile usability & accessibility spot-check**
+#### 7. Mobile usability & accessibility spot-check
 - GSC's Mobile Usability report for flagged issues (tap targets too close, content wider than screen)
 - Spot-check 3–5 key pages with a free accessibility scanner (WAVE or axe DevTools) for anything beyond what Screaming Frog's crawl already caught — contrast issues, missing form labels, focus order
 - Manually tab through the primary navigation and a key form to confirm keyboard accessibility hasn't regressed
 
-**8. AI-crawlability check**
+#### 8. AI-crawlability check
 - Confirm `robots.txt` and `/llms.txt` resolve correctly and return the expected content (`curl` both to verify)
 - Spot-check server access logs for AI bot user-agent activity (GPTBot, ClaudeBot, PerplexityBot) to confirm they're actually reaching the site, not just permitted to
 - Re-check `/llms.txt` content is still accurate against current site structure — flag if URLs have changed or content has gone stale
 
-**9. Backlink & external signal check**
+#### 9. Backlink & external signal check
 - Quick check in GSC's Links report for new/lost referring domains — a sudden drop can indicate a technical issue (broken redirect, accidental noindex) rather than an actual link loss
 - Not a full backlink audit every cycle — reserve deep link-profile analysis for cases where organic traffic has dropped unexpectedly
 
-**10. Security & uptime check**
+#### 10. Security & uptime check
 - Confirm SSL certificate is valid and not nearing expiry
 - Confirm no mixed-content warnings (HTTP resources loading on an HTTPS page)
 - Check hosting/uptime monitoring logs for any downtime since the last audit — even brief outages can affect crawl trust
 
-**11. Local SEO check** *(where applicable — service-area or location-based clients)*
+#### 11. Local SEO check *(where applicable — service-area or location-based clients)*
 - Google Business Profile still matches site NAP (name, address, phone) exactly
 - LocalBusiness schema present and accurate
 
-**12. Re-test after fixes ship, then log the new baseline**
+#### 12. Re-test after fixes ship, then log the new baseline
 - Re-run the relevant checks (not the full process) to confirm each fix actually worked
 - Log the new baseline metrics — this becomes the comparison point for the next cycle, so improvement (or regression) is visible over time rather than reassessed from scratch each quarter
 
