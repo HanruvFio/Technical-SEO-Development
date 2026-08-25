@@ -4,6 +4,45 @@ Three-pillar SEO checklist applied to every build/rebuild. Run at project kickof
 
 ---
 
+## 0. Kickoff / Build-Phase Checklist
+
+What gets decided and built in during kickoff and development — cheaper to get right the first time than to retrofit post-launch. Run through this at project kickoff and keep it live through the build, not as a single one-off checklist.
+
+### Foundation
+- [ ] URL structure locked in early — clean, hierarchical, keyword-relevant slugs; trailing-slash convention decided once, not per-page
+- [ ] Domain/protocol decision made upfront — www vs non-www, http vs https — so there's nothing to retroactively 301 later
+- [ ] Redirect map built before launch (rebuilds only) — every old URL mapped to its new destination before go-live
+- [ ] Staging environment noindexed + access-restricted from day one
+- [ ] Information architecture planned against crawl depth — key pages within 3–4 clicks of home, decided at the sitemap/nav planning stage
+
+### Performance Habits
+- [ ] Lightweight starting point (lean Elementor setup / minimal Webflow interactions) — bloat is harder to strip out later than to avoid
+- [ ] Image pipeline decided at the CMS/component level — WebP/AVIF export, compression, responsive `srcset` — so every image follows the rule automatically
+- [ ] Font strategy decided early: self-hosted, subsetted, limited weights/families
+- [ ] Critical CSS / above-the-fold rendering approach designed into the template architecture, not retrofitted
+- [ ] Third-party scripts added deliberately and audited as they're added (chat widgets, pixels) — not accumulated by default
+- [ ] Lazy-loading pattern built into the image/component library from the start
+
+### Structure & Accessibility
+- [ ] Title tags & meta descriptions built into the CMS content model as required fields from day one
+- [ ] Page-level schema (FAQ, Product, Article, etc.) added as each page is built, not left as a launch-week task
+- [ ] Semantic heading hierarchy defined per template, not per page as an afterthought
+- [ ] Canonical tag logic handled at the template/platform level — especially Webflow CMS pagination and WooCommerce filtered views
+- [ ] Alt text made a required field in the image upload workflow, not a launch-week cleanup task
+- [ ] `lang` attribute set at the template level from day one
+- [ ] Accessible patterns (keyboard nav, visible focus states, proper labels) built into the component library once, rather than audited page-by-page later
+
+### Crawlability & AI/Agentic Discoverability
+- [ ] `robots.txt` and `sitemap.xml` scaffolded and live on staging early, refined for production at launch
+- [ ] `llms.txt` drafted alongside the content itself, not written as a rushed launch-week task
+- [ ] Structured data (schema) built into templates by type as the site-wide default layer — distinct from the page-level schema above
+
+### Tracking & Infra
+- [ ] GA4 + GTM containers stood up on staging early enough that QA can validate events before launch
+- [ ] GSC/Bing verification method (DNS TXT) planned so it can go live the same day as the domain does
+
+---
+
 ## Post-Launch Audit Process
 
 A repeatable process to run on every live site — not a one-time launch check. Same steps every cycle, so results are comparable over time.
