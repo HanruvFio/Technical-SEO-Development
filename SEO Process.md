@@ -160,6 +160,18 @@ A repeatable process to run on every live site — not a one-time launch check. 
 - Load the rest of the stylesheet async via `<link rel="preload" as="style" onload="this.rel='stylesheet'">` or a helper like loadCSS
 - Often a bigger LCP lever than JS — the LCP element (usually hero image/heading) can't paint until its styles resolve
 
+**How to check if critical CSS is already inlined (any platform)**
+- View Page Source (not DevTools Inspect — raw HTML as delivered) → check `<head>` for an actual `<style>` block with CSS rules written inline, vs. only `<link rel="stylesheet">` tags pointing to external files. Only `<link>` tags = nothing inlined
+- PageSpeed Insights → "Eliminate render-blocking resources" flag is a strong signal nothing critical is inlined; "Reduce unused CSS" often co-occurs
+- DevTools → Coverage tab (`Cmd+Shift+P` / `Ctrl+Shift+P` → "Coverage" → reload) shows used vs. unused CSS per file — one large external file with heavy "unused" (red) confirms no critical-path splitting
+
+**WordPress/Elementor — implementation**
+- Not handled natively by WordPress core or Elementor — genuinely manual or requires a plugin/build tool, unlike width/height or lazy-loading which are largely automatic
+- **Step 1 (default first move, do this on every Elementor site before reaching for a plugin):** Elementor → Settings → Experiments → enable **"Improved CSS Loading"** (and **"Improved Asset Loading"**) — free, native, loads CSS only for widgets actually used per page instead of one global stylesheet. Not true critical-path inlining, but a meaningful, zero-cost reduction in render-blocking CSS. Re-check PageSpeed's render-blocking savings estimate after enabling before deciding whether further work is needed
+- **Step 2 (only if step 1's estimate is still significant):** caching plugin with a built-in critical CSS feature — **WP Rocket** (Settings → File Optimization → "Optimize CSS Delivery", auto-generates + inlines critical CSS per page) or **Perfmatters**/**FlyingPress** — easiest path to true inlining, minimal manual work once configured
+- **Step 3 (only for high-traffic sites where the maintenance overhead is worth it):** generate critical CSS with a tool like **Critical** or **Penthouse** (Node-based, run against the live URL), then hand-paste the output into a `<style>` block via a header snippet (functions.php `wp_head` hook, or a code-injection plugin like Insert Headers and Footers) — needs regenerating whenever the above-the-fold layout changes, so real ongoing maintenance
+- Worth deciding per-client whether steps 2–3 are justified — weigh against the site's actual render-blocking CSS impact (PageSpeed's estimated savings) rather than applying as a blanket rule
+
 **LCP-specific**
 - Preload the actual LCP resource: `<link rel="preload" as="image" href="hero.jpg">` so the browser fetches it immediately instead of discovering it late in the HTML
 - Never lazy-load the LCP image — it's the one image that should load eagerly
