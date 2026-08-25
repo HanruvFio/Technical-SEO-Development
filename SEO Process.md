@@ -286,6 +286,7 @@ Platform-agnostic — no Webflow-native tools or WordPress plugins assumed. All 
 #### robots.txt
 - Plain text file — no tool required to create, just a text editor + SFTP access
 - Build one master AI-bot ruleset template, adapt per client rather than rebuilding from scratch each time
+- [Create a robot.txt here - allow all and leave rest on default](https://www.seoptimer.com/robots-txt-generator)
 - [technicalseo.com/tools/robots-txt](https://technicalseo.com/tools/robots-txt/) — free generator/validator, builds rules per user-agent through a UI
 - [Yandex Robots.txt Analyzer](https://webmaster.yandex.com/tools/robotstxt/) — free syntax/directive validator, no account needed
 - Google Search Console's robots.txt tester for validation post-deploy
