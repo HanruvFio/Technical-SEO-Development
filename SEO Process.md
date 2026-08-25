@@ -281,6 +281,7 @@ Platform-agnostic — no Webflow-native tools or WordPress plugins assumed. All 
 - Script (Node/Python) that reads site structure from Webflow's CMS API or WordPress's REST API and outputs `sitemap.xml` directly — full control over exclusions, priorities, `lastmod` accuracy
 - Screaming Frog can also generate one from a crawl (Mode → Spider/List → Sitemaps → Create XML Sitemap) — reuses a tool already in the workflow
 - XML-Sitemaps.com for a quick one-off crawl-based generator
+- Webflow creates this by default
 - Deploy the static file to root via SFTP/hosting file manager
 
 #### robots.txt
