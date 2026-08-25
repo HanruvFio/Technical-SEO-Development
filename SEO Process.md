@@ -77,11 +77,7 @@ A repeatable process to run on every live site — not a one-time launch check. 
 - Google Business Profile still matches site NAP (name, address, phone) exactly
 - LocalBusiness schema present and accurate
 
-**12. Compile findings into a single prioritized fix list**
-- Sort by actual impact across all three pillars together, not siloed by pillar — a single fix (e.g. a render-blocking third-party script) can touch performance and crawlability at once
-- Flag anything that's a regression from the previous cycle separately from net-new issues — regressions usually indicate a recent change broke something and deserve faster turnaround
-
-**13. Re-test after fixes ship, then log the new baseline**
+**12. Re-test after fixes ship, then log the new baseline**
 - Re-run the relevant checks (not the full process) to confirm each fix actually worked
 - Log the new baseline metrics — this becomes the comparison point for the next cycle, so improvement (or regression) is visible over time rather than reassessed from scratch each quarter
 
@@ -181,6 +177,7 @@ PageSpeed Insights' "Render-blocking requests" audit will list the exact resourc
 - [ ] Form fields have associated `<label>` elements
 - [ ] ARIA roles used only where semantic HTML isn't sufficient
 - [ ] Focus states visible on all interactive elements
+- [ ] `lang` attribute set on `<html>` (matches actual page/content language — check per-language templates on multilingual sites, not just the default)
 
 ### Linking & Indexation
 - [ ] No broken internal/external links (Screaming Frog 4xx/5xx report)
