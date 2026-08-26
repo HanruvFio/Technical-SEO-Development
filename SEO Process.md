@@ -236,23 +236,61 @@ PageSpeed Insights' "Render-blocking requests" audit will list the exact resourc
 - [ ] `lang` attribute set on `<html>` (matches actual page/content language — check per-language templates on multilingual sites, not just the default)
 
 ### Linking & Indexation
-- [ ] No broken internal/external links (Screaming Frog 4xx/5xx report)
-- [ ] No redirect chains (301 → 301 → 200)
+- [x] **No broken internal/external links (Screaming Frog 4xx/5xx report)**
+  - **Internal links:** Internal tab → sort by Status Code, or use the filter dropdown → Client Error (4xx) / Server Error (5xx)
+  - **External links:** External tab → same filter approach. Requires **Configuration → Spider → Crawl → Check External Links** to be ticked *before* the crawl, otherwise external links aren't checked at all
+  - **Find the source page for a broken link:** click the broken URL → **Inlinks** tab in the bottom pane → lists every page linking to it, with anchor text
+  - **Client-ready export:** Bulk Export (top menu) → Response Codes → **Client Error (4xx) Inlinks** / **Server Error (5xx) Inlinks** for internal, or **External Client Error (4xx)** / **External Server Error (5xx)** for outbound — produces a spreadsheet of every broken link, its source page, and anchor text
+  - Fix: update/remove internal links pointing to 4xx pages, 301 redirect where a real replacement page exists; for external 4xx/5xx, replace with a live source or remove the link
+- [x] **No redirect chains (301 → 301 → 200)**
+  - **Reports** (top menu) → **Redirects** → **Redirect Chains** → exports straight to CSV (requires a Screaming Frog license — locked in free version)
+  - Download the CSV, post it to Claude/ChatGPT to check for chains and confirm nothing needs fixing
+  - Header row only, no data rows = no chains found, nothing to fix
+  - Fix if chains exist: update the original internal links to point straight to the final destination URL, skipping the middle hops entirely — leave the actual redirects live (for backlinks/bookmarks pointing at old URLs), just don't let internal links traverse them
 - [ ] XML sitemap present, submitted to Search Console, auto-updates on publish
-- [ ] `robots.txt` doesn't block anything it shouldn't
+- [x] **`robots.txt` doesn't block anything it shouldn't**
+  - **Response Codes** tab → filter dropdown → **Blocked by Robots.txt**, or **Internal** tab → filter by **Indexability Status** → **Blocked by Robots.txt** — lists every URL disallowed by robots.txt
+  - Review against what should actually be blocked (staging, admin/thank-you pages, filtered/parameterized URLs) — flag anything important (real content pages, key templates) showing up here by mistake
+  - To test a specific path directly against the live robots.txt without a full crawl: **Configuration → robots.txt → Custom** → paste a path → shows allow/disallow instantly
+  - Fix: edit the Disallow rules (Webflow: Project Settings → SEO → robots.txt editor) to remove the overly broad rule, then re-test the same path in the Custom tester to confirm it now resolves as allowed
+  - **Verified on HNLT:** only 2 blocked entries found — Google Maps embed (blocked by Google's own robots.txt, unrelated to the site) and the `.webflow.io` staging subdomain (correctly blocked entirely via `Disallow: /`). No real content pages wrongly blocked — pass
 - [ ] Internal linking supports topic clusters — no orphan pages
 - [ ] Pagination/faceted nav doesn't create crawl traps (WooCommerce/JetSmartFilters especially)
 
 ### Canonicalization
 A canonical URL tells search engines/crawlers which version of a page is the "master" one when the same or similar content is reachable via multiple URLs (parameters, filters, http vs https, pagination, etc.) — preventing ranking signals from being split across duplicates.
 
-- [ ] Self-referencing canonical tag on every page by default — confirm the platform is actually outputting it correctly, don't assume
-- [ ] `http`/`https` and `www`/non-`www` forced to one version via 301 redirect (canonical tag is a backstop, not the fix)
-- [ ] Trailing-slash vs no-slash consistency enforced site-wide
+- [x] **Self-referencing canonical tag on every page by default — confirm the platform is actually outputting it correctly, don't assume**
+  - Check via **View Page Source** (not DevTools) → search for `canonical` in the raw HTML. If missing, don't assume the platform handles it automatically
+  - **Webflow fix:** Page Settings (gear icon on the page in Pages panel) → **Page canonical URL** field → enter that page's own full URL. Every page gets its own canonical pointing to itself (not one canonical for the whole site) — homepage canonicals to the homepage URL, About page to its own URL, each blog post to its own URL, etc. This overrides the global canonical tag in site settings for that page. Webflow auto-strips the trailing slash on save
+  - Set this per static page. **CMS collection pages** (blog posts etc.) can't use a manually-typed URL per item here since each item needs its own slug — check whether Webflow's global/site-wide canonical setting already handles collection items correctly by default before assuming a per-item fix is needed
+  - Re-crawl with Screaming Frog after publishing to confirm the Canonical Link Element 1 column now matches the Address column on every page
+- [x] **`http`/`https` and `www`/non-`www` forced to one version via 301 redirect (canonical tag is a backstop, not the fix)**
+  - Screaming Frog **List mode** → paste the 4 domain variants, **one per line** (not comma-separated — the URL List dialog requires each on its own line):
+    ```
+    http://domain.com
+    https://domain.com
+    http://www.domain.com
+    https://www.domain.com
+    ```
+    → crawl
+  - Check **Status Code** column: exactly one variant should return 200, the other three should return 301, all pointing (via **Redirect URL** column) straight to that single canonical version — not chained through each other
+  - **Webflow fix:** Project Settings → Hosting → set the primary domain — this handles the www/non-www redirect automatically. HTTPS is enforced by default on Webflow-hosted sites
+  - **Verified on HNLT:** `https://www.hnlt.co.uk/` returns 200, the other 3 variants (http, non-www) return 301 → all Non-Indexable/Redirected. Pass, no fix needed
+- [x] **Trailing-slash vs no-slash consistency enforced site-wide**
+  - Internal tab → sort **Address** column alphabetically → scan for inconsistent trailing-slash style across similar page types
+  - Better test — **List mode**: enter both versions (with/without trailing slash) for a sample of pages → crawl → check **Status Code**: one should return 200, the other 301 redirecting to it. Both returning 200 independently = duplicate content, no redirect enforcing consistency
+  - Also check **Reports → Duplicates** for trailing/non-trailing pairs both showing as live 200s with identical content
+  - **Webflow fix:** Webflow serves all URLs without a trailing slash by default and auto-301s any trailing-slash version to the clean one — native behavior, not per-page configurable. If a List-mode test shows both versions returning 200 independently, that's unusual for a native Webflow site and worth investigating that specific page/template further
+  - **Verified on HNLT:** homepage is `/` (root, inherent — not a page-level trailing slash), every other page has no trailing slash (`/for-businesses`, `/privacy-policy`, etc.) — consistent, pass
 - [ ] Staging/dev subdomains are `noindex` and not publicly linked
 - [ ] **WooCommerce/JetSmartFilters:** filtered/sorted product URLs (`?color=red&sort=price`) canonical back to the clean category URL
 - [ ] **Webflow CMS pagination:** paginated collection pages (`/blog?page=2`) self-canonicalize or point to page 1 if paginated content isn't meaningfully distinct
-- [ ] No canonical chains (A → B → C) or canonicals pointing to 404s/redirects
+- [x] **No canonical chains (A → B → C) or canonicals pointing to 404s/redirects**
+  - Internal tab → check that the **Address** column and **Canonical Link Element 1** column are identical on every row (self-referencing = matching)
+  - Sort by the **Canonical Link Element 1** column, or export the Internal tab to CSV, to scan faster than eyeballing row by row
+  - Any row where they don't match: check that canonical target's own status code — confirm it's a live 200, not a 404 or a redirect, and that it doesn't itself point to a different canonical (which would be a chain)
+  - Fix: point the canonical tag directly at the final, live, 200-status URL — never through an intermediate hop
 - [ ] Audit via Screaming Frog's canonical report pre-launch
 
 ### Structured Data
