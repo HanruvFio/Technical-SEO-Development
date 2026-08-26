@@ -294,11 +294,60 @@ A canonical URL tells search engines/crawlers which version of a page is the "ma
 - [ ] Audit via Screaming Frog's canonical report pre-launch
 
 ### Structured Data
-- [ ] Organization/LocalBusiness schema on every site
+- [x] **Organization/LocalBusiness schema on every site**
+  - Not the same as Google Business Profile (google.com/business) — that's a separate Maps/Search listing managed directly through Google, unrelated to code on the site itself
+  - **Check:** View Page Source on the homepage → search for `application/ld+json` → look for `"@type": "Organization"` or `"@type": "LocalBusiness"` in the script content. Or run the page through **Google's Rich Results Test** (search.google.com/test/rich-results) to parse and validate any structured data found
+  - **Webflow fix:** no dedicated schema field — add as raw JSON-LD. Project Settings (site-wide, not page settings) → **Custom Code** tab → paste into **Footer Code** box (before `</body>`) so it applies site-wide:
+    ```html
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Business Name",
+      "url": "https://www.example.com",
+      "logo": "https://www.example.com/logo.png",
+      "telephone": "+44...",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "...",
+        "addressLocality": "...",
+        "postalCode": "...",
+        "addressCountry": "..."
+      }
+    }
+    </script>
+    ```
+    **What each field means:**
+    - `@context` — always `"https://schema.org"`, tells search engines which schema vocabulary this data uses. Never changes
+    - `@type` — the kind of entity this is (`LocalBusiness`, `Organization`, etc.) — determines which fields are expected
+    - `name` — the business's official name as it should appear in search results
+    - `url` — the site's homepage URL
+    - `logo` — direct link to the logo image file (not the page it's on — the actual image URL)
+    - `telephone` — business contact number, include country code (e.g. `+44`)
+    - `address` — a nested object (its own `@type: PostalAddress`) breaking the address into parts search engines can read individually, rather than one string:
+      - `streetAddress` — street name and number
+      - `addressLocality` — the town/city
+      - `postalCode` — postcode/zip
+      - `addressCountry` — country, usually as a 2-letter code (e.g. `GB`, `US`)
+    Publish, then re-check via Rich Results Test
+  - **WordPress fix:** check what's already installed first — duplicate schema (plugin + hand-coded) causes conflicts
+    - **Yoast SEO:** SEO → Search Appearance → General tab → set site representation to Organization (or Person), fill in name/logo. Full LocalBusiness fields (address, hours) need Yoast's separate **Local SEO** add-on
+    - **Rank Math:** enable the **Local SEO module** (Dashboard → Modules) → Titles & Meta → Local SEO tab → fill in business details — outputs LocalBusiness schema automatically
+    - **No SEO plugin / doesn't cover this:** use a snippet plugin (**Insert Headers and Footers** or **WPCode**) → paste the same JSON-LD script into the header/footer field
+  - Before adding anything on either platform, confirm schema doesn't already exist (View Page Source → search `ld+json`) — same rule as canonicals, don't stack a duplicate on top of one already there
 - [ ] Article/BlogPosting schema on blog content
 - [ ] Product schema on ecommerce
 - [ ] FAQ schema where applicable
-- [ ] Validate via Google Rich Results Test before launch
+- [x] **Validate via Google Rich Results Test before launch**
+  - Go to **search.google.com/test/rich-results**
+  - Either paste the live page URL, or switch to the **Code** tab and paste the raw HTML/JSON-LD directly — useful for testing before publishing, or testing on staging Google can't crawl
+  - Click **Test URL** / **Test Code** — Google lists every structured data type it detected (e.g. LocalBusiness), each with:
+    - **Valid items** — parsed correctly, eligible for rich results
+    - **Errors** — required fields missing or malformed, must fix before it validates
+    - **Warnings** — optional fields recommended but not required, won't block validation
+  - Click into the detected item to see the exact field-by-field breakdown Google read — confirms it picked up `name`, `address`, `telephone`, etc. exactly as intended, not just that no errors were thrown
+  - Fix loop: correct the JSON-LD in Custom Code → republish → re-run the test on the live URL to confirm it's clean
+  - **Fixed on HNLT:** schema was present but nested inside another `<script>` tag (the Lenis smooth-scroll script), which broke both scripts — browsers read everything up to the first literal `</script>` as one block, so the `<script type="application/ld+json">` tag sitting mid-block caused a syntax error and Google saw no valid JSON-LD at all. Fix: properly closed the Lenis script with `</script>` before starting a separate schema script block. Re-tested: both LocalBusiness and Organization now show as valid items
 
 ---
 
