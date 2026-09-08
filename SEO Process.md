@@ -237,8 +237,9 @@ PageSpeed Insights' "Render-blocking requests" audit will list the exact resourc
 
 ### Linking & Indexation
 - [x] **No broken internal/external links (Screaming Frog 4xx/5xx report)**
-  - **Internal links:** Internal tab → sort by Status Code, or use the filter dropdown → Client Error (4xx) / Server Error (5xx)
-  - **External links:** External tab → same filter approach. Requires **Configuration → Spider → Crawl → Check External Links** to be ticked *before* the crawl, otherwise external links aren't checked at all
+  - **Where to find the filter:** click the **Response Codes** tab (a separate top-level tab, next to Internal/External — NOT a filter within the Internal tab). Use the filter dropdown *there* — it shows status-based options: No Response, Success (2xx), Redirection (3xx), Client Error (4xx), Server Error (5xx), etc. Select **Client Error (4xx)**, then re-run with **Server Error (5xx)**. (The dropdown on the Internal tab only filters by content type — HTML/JS/CSS/Images/etc. — not status code.)
+  - **Internal links:** confirmed via the Response Codes tab filter above
+  - **External links:** same Response Codes tab/filter approach. Requires **Configuration → Spider → Crawl → Check External Links** to be ticked *before* the crawl, otherwise external links aren't checked at all
   - **Find the source page for a broken link:** click the broken URL → **Inlinks** tab in the bottom pane → lists every page linking to it, with anchor text
   - **Client-ready export:** Bulk Export (top menu) → Response Codes → **Client Error (4xx) Inlinks** / **Server Error (5xx) Inlinks** for internal, or **External Client Error (4xx)** / **External Server Error (5xx)** for outbound — produces a spreadsheet of every broken link, its source page, and anchor text
   - Fix: update/remove internal links pointing to 4xx pages, 301 redirect where a real replacement page exists; for external 4xx/5xx, replace with a live source or remove the link
