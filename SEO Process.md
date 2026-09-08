@@ -244,9 +244,10 @@ PageSpeed Insights' "Render-blocking requests" audit will list the exact resourc
   - **Client-ready export:** Bulk Export (top menu) → Response Codes → **Client Error (4xx) Inlinks** / **Server Error (5xx) Inlinks** for internal, or **External Client Error (4xx)** / **External Server Error (5xx)** for outbound — produces a spreadsheet of every broken link, its source page, and anchor text
   - Fix: update/remove internal links pointing to 4xx pages, 301 redirect where a real replacement page exists; for external 4xx/5xx, replace with a live source or remove the link
 - [x] **No redirect chains (301 → 301 → 200)**
-  - **Reports** (top menu) → **Redirects** → **Redirect Chains** → exports straight to CSV (requires a Screaming Frog license — locked in free version)
+  - **Reports** (top menu) → **Redirects** → **Redirect Chains** → exports straight to CSV. Available on the **free version** — not license-gated. The only real free-tier constraint is the 500 URL crawl cap; if the site's under that, this report works exactly the same as paid
   - Download the CSV, post it to Claude/ChatGPT to check for chains and confirm nothing needs fixing
-  - Header row only, no data rows = no chains found, nothing to fix
+  - Header row only, no data rows = no chains found, nothing to fix. (The CSV header alone includes columns like Chain Type, Number of Redirects, Source, Address, Final Address, Final Status Code, plus per-hop Status Code/Redirect Type/Redirect URL columns — if there's nothing below that header row, the crawl is clean.)
+  - Columns include: Chain Type (HTTP Redirect / JS Redirect / Meta Refresh), Number of Redirects (hop count), Redirect Loop (true/false), Temp Redirect in Chain (true/false), plus start and final URL/status
   - Fix if chains exist: update the original internal links to point straight to the final destination URL, skipping the middle hops entirely — leave the actual redirects live (for backlinks/bookmarks pointing at old URLs), just don't let internal links traverse them
 - [ ] XML sitemap present, submitted to Search Console, auto-updates on publish
 - [x] **`robots.txt` doesn't block anything it shouldn't**
@@ -263,6 +264,7 @@ A canonical URL tells search engines/crawlers which version of a page is the "ma
 
 - [x] **Self-referencing canonical tag on every page by default — confirm the platform is actually outputting it correctly, don't assume**
   - Check via **View Page Source** (not DevTools) → search for `canonical` in the raw HTML. If missing, don't assume the platform handles it automatically
+  - **In Screaming Frog:** click the **Internal** tab → look at two columns side by side: **Address** and **Canonical Link Element 1**. If the Canonical column isn't visible, right-click any column header → make sure **Canonical Link Element 1** is ticked to display. **Self-referencing = pass:** each row's Address should match its own Canonical Link Element 1 value exactly
   - **Webflow fix:** Page Settings (gear icon on the page in Pages panel) → **Page canonical URL** field → enter that page's own full URL. Every page gets its own canonical pointing to itself (not one canonical for the whole site) — homepage canonicals to the homepage URL, About page to its own URL, each blog post to its own URL, etc. This overrides the global canonical tag in site settings for that page. Webflow auto-strips the trailing slash on save
   - Set this per static page. **CMS collection pages** (blog posts etc.) can't use a manually-typed URL per item here since each item needs its own slug — check whether Webflow's global/site-wide canonical setting already handles collection items correctly by default before assuming a per-item fix is needed
   - Re-crawl with Screaming Frog after publishing to confirm the Canonical Link Element 1 column now matches the Address column on every page
