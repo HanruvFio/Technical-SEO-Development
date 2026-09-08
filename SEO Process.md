@@ -8,6 +8,7 @@ Three-pillar SEO checklist applied to every build/rebuild. Run at project kickof
 
 What gets decided and built in during kickoff and development — cheaper to get right the first time than to retrofit post-launch. Run through this at project kickoff and keep it live through the build, not as a single one-off checklist.
 
+<a id="foundation"></a>
 ### Foundation
 - [ ] URL structure locked in early — clean, hierarchical, keyword-relevant slugs; trailing-slash convention decided once, not per-page
 - [ ] Domain/protocol decision made upfront — www vs non-www, http vs https — so there's nothing to retroactively 301 later
@@ -15,6 +16,7 @@ What gets decided and built in during kickoff and development — cheaper to get
 - [ ] Staging environment noindexed + access-restricted from day one
 - [ ] Information architecture planned against crawl depth — key pages within 3–4 clicks of home, decided at the sitemap/nav planning stage
 
+<a id="performance-habits"></a>
 ### Performance Habits
 - [ ] Lightweight starting point (lean Elementor setup / minimal Webflow interactions) — bloat is harder to strip out later than to avoid
 - [ ] Image pipeline decided at the CMS/component level — WebP/AVIF export, compression, responsive `srcset` — so every image follows the rule automatically
@@ -23,6 +25,7 @@ What gets decided and built in during kickoff and development — cheaper to get
 - [ ] Third-party scripts added deliberately and audited as they're added (chat widgets, pixels) — not accumulated by default
 - [ ] Lazy-loading pattern built into the image/component library from the start
 
+<a id="structure-accessibility"></a>
 ### Structure & Accessibility
 - [ ] Title tags & meta descriptions built into the CMS content model as required fields from day one
 - [ ] Page-level schema (FAQ, Product, Article, etc.) added as each page is built, not left as a launch-week task
@@ -32,11 +35,13 @@ What gets decided and built in during kickoff and development — cheaper to get
 - [ ] `lang` attribute set at the template level from day one
 - [ ] Accessible patterns (keyboard nav, visible focus states, proper labels) built into the component library once, rather than audited page-by-page later
 
+<a id="crawlability-aiagentic-discoverability"></a>
 ### Crawlability & AI/Agentic Discoverability
 - [ ] `robots.txt` and `sitemap.xml` scaffolded and live on staging early, refined for production at launch
 - [ ] `llms.txt` drafted alongside the content itself, not written as a rushed launch-week task
 - [ ] Structured data (schema) built into templates by type as the site-wide default layer — distinct from the page-level schema above
 
+<a id="tracking-infra"></a>
 ### Tracking & Infra
 - [ ] GA4 + GTM containers stood up on staging early enough that QA can validate events before launch
 - [ ] GSC/Bing verification method (DNS TXT) planned so it can go live the same day as the domain does
@@ -52,8 +57,10 @@ A repeatable process to run on every live site — not a one-time launch check. 
 - **Settling-In Check:** short re-run once Google and other bots have had time to properly crawl the live site
 - **Quarterly (Ongoing):** full run-through as standard maintenance for every client site in the portfolio
 
+<a id="the-process"></a>
 ### The Process
 
+<a id="1-confirm-trackingindexing-infrastructure-is-live"></a>
 #### 1. Confirm tracking/indexing infrastructure is live
 - **First-time setup (new site or new client):**
   - Generate and deploy **sitemap.xml** to root (see [Tools & Methods → Sitemaps](#sitemaps) under Pillar 3 for generation options) before anything else in this list — GSC and Bing both need it. Sanity-check with `curl yourdomain.com/sitemap.xml` to confirm it resolves before submitting
@@ -70,52 +77,63 @@ A repeatable process to run on every live site — not a one-time launch check. 
   - Confirm GTM containers (if used) are publishing the correct live version, not a draft
 - Nothing downstream in this process is trustworthy if this step is broken
 
+<a id="2-full-crawl"></a>
 #### 2. Full crawl
 - Screaming Frog crawl of the entire site
 - Export and review: 4xx/5xx errors, redirect chains (301→301→200), duplicate titles/meta descriptions, missing H1s, orphan pages
 - Cross-check crawl depth — important pages shouldn't be buried more than 3–4 clicks from the homepage
 
+<a id="3-performance-snapshot"></a>
 #### 3. Performance snapshot
 - PageSpeed Insights (lab data) on the homepage plus 2–3 key page templates — not every page individually, since templates surface systemic issues that repeat across many pages
 - Check the **CrUX/field data** tab in PageSpeed Insights (or Search Console's Core Web Vitals report) alongside lab data — field data reflects real visitor experience over the last 28 days and can reveal issues lab tests miss (e.g. slow real-world connections, specific devices)
 - Note any pages flagged "poor" or "needs improvement" in Core Web Vitals specifically, since these directly affect ranking
 
+<a id="4-indexation-check"></a>
 #### 4. Indexation check
 - Compare GSC's Coverage/Indexing report against the actual sitemap — flag anything submitted but not indexed, and anything indexed but not in the sitemap
 - Spot-check `site:domain.com` in Google for anything indexed that shouldn't be (staging leftovers, filtered/parameterized URLs, thank-you pages)
 - Check GSC's "Removed" and "Not found (404)" reports for anything unexpected
 
+<a id="5-canonical-duplicate-content-check"></a>
 #### 5. Canonical & duplicate content check
 - Screaming Frog's canonical report, cross-referenced against known filtered/paginated URL patterns (WooCommerce filters, Webflow CMS pagination)
 - Confirm `http`/`https` and `www`/non-`www` still resolve to a single version post-launch — a hosting or DNS change can silently break this
 
+<a id="6-structured-data-validation"></a>
 #### 6. Structured data validation
 - Run Google's Rich Results Test against every schema type in use on the site
 - Confirm schema values actually match live page content (a common drift issue — schema gets set once and never updated as content changes)
 
+<a id="7-mobile-usability-accessibility-spot-check"></a>
 #### 7. Mobile usability & accessibility spot-check
 - GSC's Mobile Usability report for flagged issues (tap targets too close, content wider than screen)
 - Spot-check 3–5 key pages with a free accessibility scanner (WAVE or axe DevTools) for anything beyond what Screaming Frog's crawl already caught — contrast issues, missing form labels, focus order
 - Manually tab through the primary navigation and a key form to confirm keyboard accessibility hasn't regressed
 
+<a id="8-ai-crawlability-check"></a>
 #### 8. AI-crawlability check
 - Confirm `robots.txt` and `/llms.txt` resolve correctly and return the expected content (`curl` both to verify)
 - Spot-check server access logs for AI bot user-agent activity (GPTBot, ClaudeBot, PerplexityBot) to confirm they're actually reaching the site, not just permitted to
 - Re-check `/llms.txt` content is still accurate against current site structure — flag if URLs have changed or content has gone stale
 
+<a id="9-backlink-external-signal-check"></a>
 #### 9. Backlink & external signal check
 - Quick check in GSC's Links report for new/lost referring domains — a sudden drop can indicate a technical issue (broken redirect, accidental noindex) rather than an actual link loss
 - Not a full backlink audit every cycle — reserve deep link-profile analysis for cases where organic traffic has dropped unexpectedly
 
+<a id="10-security-uptime-check"></a>
 #### 10. Security & uptime check
 - Confirm SSL certificate is valid and not nearing expiry
 - Confirm no mixed-content warnings (HTTP resources loading on an HTTPS page)
 - Check hosting/uptime monitoring logs for any downtime since the last audit — even brief outages can affect crawl trust
 
+<a id="11-local-seo-check-where-applicable-service-area-or-location-based-clients"></a>
 #### 11. Local SEO check *(where applicable — service-area or location-based clients)*
 - Google Business Profile still matches site NAP (name, address, phone) exactly
 - LocalBusiness schema present and accurate
 
+<a id="12-re-test-after-fixes-ship-then-log-the-new-baseline"></a>
 #### 12. Re-test after fixes ship, then log the new baseline
 - Re-run the relevant checks (not the full process) to confirm each fix actually worked
 - Log the new baseline metrics — this becomes the comparison point for the next cycle, so improvement (or regression) is visible over time rather than reassessed from scratch each quarter
@@ -130,6 +148,7 @@ A repeatable process to run on every live site — not a one-time launch check. 
 
 **Target:** 90+ mobile, LCP < 2.5s, CLS < 0.1, INP < 200ms
 
+<a id="images"></a>
 ### Images
 - [ ] Serve next-gen formats (WebP/AVIF)
 - [ ] Responsive `srcset`/`sizes` — no oversized images loaded on mobile
@@ -138,12 +157,14 @@ A repeatable process to run on every live site — not a one-time launch check. 
 - [ ] Compress all assets before upload (no unoptimized exports from design tools)
 - [ ] Hero/LCP image preloaded, not lazy-loaded
 
+<a id="fonts"></a>
 ### Fonts
 - [ ] `font-display: swap` (or `optional`) on all @font-face declarations
 - [ ] Self-host fonts where possible instead of external requests (Google Fonts, etc.)
 - [ ] Subset fonts to used character sets
 - [ ] Preload critical fonts
 
+<a id="js-css"></a>
 ### JS / CSS
 - [ ] Minify and bundle CSS/JS
 - [ ] Remove unused CSS (especially Elementor/theme bloat, unused Webflow interactions)
@@ -203,12 +224,14 @@ PageSpeed Insights' "Render-blocking requests" audit will list the exact resourc
 
 **Takeaway:** duration doesn't always track file size — a 1KB file can cost more time than a 15KB one if it's network latency rather than transfer time. Fix in priority order: easiest/self-hostable first (Lenis), then script loading attributes (Consent Pro), then platform-locked assets last (Webflow core CSS) since those have the least direct control.
 
+<a id="server-hosting"></a>
 ### Server / Hosting
 - [ ] TTFB under 600ms
 - [ ] GZIP/Brotli compression enabled
 - [ ] Browser caching headers set correctly
 - [ ] HTTP/2 or HTTP/3 enabled
 
+<a id="platform-specific"></a>
 ### Platform-specific
 - [ ] **Webflow:** strip unused Finsweet/interaction JS, audit custom code embeds for render-blocking scripts
 - [ ] **WordPress/Elementor:** disable unused Elementor widgets/features per page, audit plugin bloat, use Elementor's native lazy-load and CSS optimization settings, evaluate object caching (Redis) on client hosting where available
@@ -219,6 +242,7 @@ PageSpeed Insights' "Render-blocking requests" audit will list the exact resourc
 
 **Target:** clean crawl, zero critical errors, logical hierarchy
 
+<a id="semantic-html-structure"></a>
 ### Semantic HTML & Structure
 - [ ] One `<h1>` per page, logical heading hierarchy (no skipped levels)
 - [ ] Semantic tags used correctly (`<nav>`, `<main>`, `<article>`, `<section>`, `<footer>`)
@@ -226,6 +250,7 @@ PageSpeed Insights' "Render-blocking requests" audit will list the exact resourc
 - [ ] Canonical tags set correctly (especially on Webflow CMS pagination, WooCommerce filtered views)
 - [ ] No duplicate content / duplicate title tags across crawl
 
+<a id="accessibility"></a>
 ### Accessibility
 - [ ] Alt text on all meaningful images (empty `alt=""` on decorative)
 - [ ] Sufficient color contrast (WCAG AA minimum)
@@ -235,6 +260,7 @@ PageSpeed Insights' "Render-blocking requests" audit will list the exact resourc
 - [ ] Focus states visible on all interactive elements
 - [ ] `lang` attribute set on `<html>` (matches actual page/content language — check per-language templates on multilingual sites, not just the default)
 
+<a id="linking-indexation"></a>
 ### Linking & Indexation
 - [x] **No broken internal/external links (Screaming Frog 4xx/5xx report)**
   - **Where to find the filter:** click the **Response Codes** tab (a separate top-level tab, next to Internal/External — NOT a filter within the Internal tab). Use the filter dropdown *there* — it shows status-based options: No Response, Success (2xx), Redirection (3xx), Client Error (4xx), Server Error (5xx), etc. Select **Client Error (4xx)**, then re-run with **Server Error (5xx)**. (The dropdown on the Internal tab only filters by content type — HTML/JS/CSS/Images/etc. — not status code.)
@@ -259,6 +285,7 @@ PageSpeed Insights' "Render-blocking requests" audit will list the exact resourc
 - [ ] Internal linking supports topic clusters — no orphan pages
 - [ ] Pagination/faceted nav doesn't create crawl traps (WooCommerce/JetSmartFilters especially)
 
+<a id="canonicalization"></a>
 ### Canonicalization
 A canonical URL tells search engines/crawlers which version of a page is the "master" one when the same or similar content is reachable via multiple URLs (parameters, filters, http vs https, pagination, etc.) — preventing ranking signals from being split across duplicates.
 
@@ -296,6 +323,7 @@ A canonical URL tells search engines/crawlers which version of a page is the "ma
   - Fix: point the canonical tag directly at the final, live, 200-status URL — never through an intermediate hop
 - [ ] Audit via Screaming Frog's canonical report pre-launch
 
+<a id="structured-data"></a>
 ### Structured Data
 - [x] **Organization/LocalBusiness schema on every site**
   - Not the same as Google Business Profile (google.com/business) — that's a separate Maps/Search listing managed directly through Google, unrelated to code on the site itself
@@ -358,6 +386,7 @@ A canonical URL tells search engines/crawlers which version of a page is the "ma
 
 No dedicated tool for this yet — process below is manual until we build/adopt one. Worth prototyping an internal checklist script (log file scan + file presence check) rather than relying on a paid platform.
 
+<a id="bot-access-discovery"></a>
 ### Bot access & discovery
 - [ ] `robots.txt` has explicit rules per AI crawler (don't rely on wildcard) — GPTBot, ClaudeBot, Google-Extended, PerplexityBot, Applebot-Extended, etc. Only block if there's a specific IP/legal reason — blocking by default loses AI-search visibility
 - [ ] `/llms.txt` present at root: H1 (site/brand name) → 1–3 sentence summary → categorized links to key pages with short descriptions
@@ -365,6 +394,7 @@ No dedicated tool for this yet — process below is manual until we build/adopt 
 - [ ] XML sitemap accurate and current (`lastmod` dates correct)
 - [ ] IndexNow (or equivalent) pinged on publish/update for faster discovery
 
+<a id="content-structure-for-machine-consumption"></a>
 ### Content structure for machine consumption
 - [ ] Clean, semantic HTML — avoid content that only renders after heavy client-side JS execution (SSR or pre-render where possible; this hits Webflow CMS-heavy builds and JS-rendered WordPress themes hardest)
 - [ ] One clear topic per page, front-loaded key info (agents/crawlers have limited crawl budget — don't bury the point)
@@ -373,11 +403,13 @@ No dedicated tool for this yet — process below is manual until we build/adopt 
 - [ ] Avoid redirect chains — agents may not follow them the way browsers do
 - [ ] Structured data doubles as machine-readable context — treat schema markup as part of this pillar, not just #2
 
+<a id="trust-attribution-signals"></a>
 ### Trust & attribution signals
 - [ ] Author/organization info clearly marked up (helps attribution accuracy in AI-generated answers)
 - [ ] Content dated and kept current — stale pages carry less weight in AI retrieval
 - [ ] Consistent NAP (name/address/positioning) across site and llms.txt — mismatched signals reduce confidence
 
+<a id="monitoring"></a>
 ### Monitoring
 - [ ] Check server access logs periodically for AI bot user-agent hits (GPTBot, ClaudeBot, PerplexityBot) to confirm they're actually reaching the site
 - [ ] Re-audit llms.txt quarterly or whenever major content/URL changes ship
